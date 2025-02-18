@@ -23,9 +23,6 @@
 
 #include "SparkFunBME280.h"
 
-#include "Arduino_LED_Matrix.h"   //Include the LED_Matrix library
-// creates an array of two frames
-
 #include <LiquidCrystal.h>
 
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
@@ -36,29 +33,6 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 BME280 mySensorB; //Uses I2C address 0x76 (jumper closed)
 float oldPressure;
 float newPressure;
-
-ArduinoLEDMatrix ledMatrix;
-byte increase[8][12] = {
-  { 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0 },
-  { 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 }
-};
-
-byte decrease[8][12] = {
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0 },
-  { 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0 },
-  { 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },
-  { 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0 }
-};
 
 byte upArrow[8] = {
   0b00100,
@@ -88,16 +62,8 @@ void setup()
 
   Wire.begin();
 
-  //mySensorA.setI2CAddress(0x77); //The default for the SparkFun Environmental Combo board is 0x77 (jumper open).
-  //If you close the jumper it is 0x76
-  //The I2C address must be set before .begin() otherwise the cal values will fail to load.
-
-  //if(mySensorA.beginI2C() == false) Serial.println("Sensor A connect failed");
-
   mySensorB.setI2CAddress(0x76); //Connect to a second sensor
   if(mySensorB.beginI2C() == false) Serial.println("Sensor B connect failed");
-
-  ledMatrix.begin();
 
   oldPressure=0;
   newPressure=0;
@@ -106,31 +72,18 @@ void setup()
   lcd.createChar(1,dnArrow);
 
   lcd.begin(16, 2);
-  // you can now interact with the LCD, e.g.:
-  //lcd.print("Hello World!");
 }
 
 void loop()
 {
-  // Serial.print("HumidityA: ");
-  // Serial.print(mySensorA.readFloatHumidity(), 0);
-
-  // Serial.print(" PressureA: ");
-  // Serial.print(mySensorA.readFloatPressure(), 0);
-
-  // Serial.print(" TempA: ");
-  // //Serial.print(mySensorA.readTempC(), 2);
-  // Serial.print(mySensorA.readTempF(), 2);
   bool rising=true;
   newPressure = mySensorB.readFloatPressure()/100;
 
   if (newPressure > oldPressure) {
     Serial.print(" Pressure increasing...");
-    ledMatrix.renderBitmap(increase, 8, 12);
     rising=true;
   } else {
     Serial.print(" Pressure decreasing...");
-    ledMatrix.renderBitmap(decrease, 8, 12);
     rising=false;
   }
 
@@ -142,7 +95,6 @@ void loop()
 
   Serial.print(" Temp: ");
   Serial.print(mySensorB.readTempC(), 2);
-  //Serial.print(mySensorB.readTempF(), 2);
 
   Serial.println();
 
@@ -161,7 +113,5 @@ void loop()
     }
     delay(1000 * 60);
   }
-
-  //delay(1000 * 60 * 60);
 }
 
