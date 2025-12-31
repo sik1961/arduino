@@ -57,7 +57,7 @@ byte dnArrow[8] = {
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Example showing alternate I2C addresses");
 
   Wire.begin();
