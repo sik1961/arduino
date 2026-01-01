@@ -45,13 +45,13 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define LOGO_HEIGHT   16
 #define LOGO_WIDTH    16
 
-#define ONE_MINUTE    1000*60
+long ONE_MINUTE=1000*60;
 
-#define QNH           1019.00
-#define COUNTER       0
-#define SAVED_PRESSURE 0        
+float QNH=101300.00;
+int COUNTER=0;
+float SAVED_PRESSURE=0;        
 
-BME280 mySensorA; //Uses default I2C address 0x77
+//BME280 mySensorA; //Uses default I2C address 0x77
 BME280 mySensorB; //Uses I2C address 0x76 (jumper closed)
 
 void setup()
@@ -64,33 +64,28 @@ void setup()
     for(;;); // Don't proceed, loop forever
   }
 
-  
-
-  //mySensorA.beginI2C(TwoWire &wirePort = Wire)
-  //mySensorA.setI2CAddress(0x76); //The default for the SparkFun Environmental Combo board is 0x77 (jumper open).
-  //If you close the jumper it is 0x76
-  //The I2C address must be set before .begin() otherwise the cal values will fail to load.
-
-  //if(mySensorA.beginI2C() == false) Serial.println("Sensor A connect failed");
-
   mySensorB.setI2CAddress(0x76); //Connect to a second sensor
   if(mySensorB.beginI2C() == false) Serial.println("Sensor B connect failed");
 
-  mySensorB.setReferencePressure(QNH * 100);
-  float savedPressure = mySensorB.readFloatPressure();
+  mySensorB.setReferencePressure(QNH);
+  SAVED_PRESSURE=mySensorB.readFloatPressure();
   String rorf="^";
+  //extern volatile int COUNTER;
+  //COUNTER=0;
 }
 
 void loop()
 {
-  COUNTER==COUNTER+1;
+  COUNTER++;
 
   if (COUNTER>59) {
-    SAVED_PRESSURE==mySensorB.readFloatPressure();
-    COUNTER==0;
+    SAVED_PRESSURE=mySensorB.readFloatPressure();
+    COUNTER=0;
   }
 
 
+  Serial.println(COUNTER);
+  Serial.println(SAVED_PRESSURE);
 
   Serial.print("HumidityA: ");
   Serial.print(String(mySensorB.readFloatHumidity()));
@@ -128,8 +123,10 @@ void loop()
   display.print(F("P:"));
   display.print(mySensorB.readFloatPressure()/100);
   if (mySensorB.readFloatPressure()>SAVED_PRESSURE) {
+    Serial.println(String("^Rising"));
     display.println("^");
   } else  {
+    Serial.println(String("vFalling"));
     display.println("v");
   }
 
@@ -141,6 +138,6 @@ void loop()
 
   display.display();
 
-  delay(1000*10);
+  delay(1000);
 }
 
