@@ -75,6 +75,7 @@ void setup()
   QNH=QNH_INIT;
 }
 
+/* Main Loop */
 void loop()
 {
   COUNTER++;
@@ -122,6 +123,7 @@ void loop()
   delay(ONE_SECOND);
 }
 
+/* The encoder was turned - adjust QNH */
 void encoder_moved() {
   static unsigned long lastInterruptTime=0;
   unsigned long interruptTime=millis();
@@ -142,7 +144,7 @@ void encoder_moved() {
   }
 }
 
-
+/* Update environmental display */
 void update_env() {
   display.clearDisplay();
 
@@ -203,9 +205,10 @@ void update_qnh() {
     display.println(QNH);
 
     display.display();
-    delay(1000);
+    delay(100);
 
   }
+  BTN_COUNTER=0;
   COUNTER=60; 
   return;
 }
