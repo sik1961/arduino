@@ -41,6 +41,7 @@ float QNH=101300.00;
 const float QNH_MAX=104000.00;
 const float QNH_MIN=96000.00;
 int COUNTER=0;
+int MINUTE=0;
 int BTN_COUNTER=0;
 int QNH_COUNTER=0;
 float SAVED_PRESSURE=0;
@@ -89,7 +90,11 @@ void loop()
 
   if (COUNTER>59) {
     update_env();
-    SAVED_PRESSURE=bmeSensor.readFloatPressure();
+    MINUTE++;
+    if (MINUTE>29) {
+      SAVED_PRESSURE=bmeSensor.readFloatPressure();
+      MINUTE=0;
+    }  
     COUNTER=0;
   }
 
