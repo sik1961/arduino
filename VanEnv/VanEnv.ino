@@ -50,7 +50,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define LOGO_HEIGHT   16
 #define LOGO_WIDTH    16
 
-long ONE_MINUTE=1000*60;
+long ONE_SECOND=1000;
 
 const float QNH_INIT=101300.00;
 float QNH=101300.00;
@@ -95,6 +95,7 @@ void loop()
   }
 
   if (COUNTER>59) {
+    update_display();
     SAVED_PRESSURE=mySensorB.readFloatPressure();
     mySensorB.setReferencePressure(QNH);
     COUNTER=0;
@@ -117,7 +118,7 @@ void loop()
   Serial.print(mySensorB.readFloatPressure()/100, 0);
 
   Serial.print(" TempA: ");
-  Serial.print(mySensorB.readTempC(), 2);
+  Serial.println(mySensorB.readTempC(), 2);
 
   
 
@@ -126,43 +127,7 @@ void loop()
   //Serial.print(mySensorB.readTempF(), 2);
   //Serial.print(mySensorB.readAllMeasurements(measurements));
 
-  display.clearDisplay();
-
-  display.setTextSize(2);             // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE);        // Draw white text
-  display.setCursor(0,0);             // Start at top-left corner
-  display.print(F("T: "));
-  display.print(mySensorB.readTempC());
-  display.println(F("c"));
-
-  display.setTextSize(2);             // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE);        // Draw white text
-  //display.setCursor(0,0);             // Start at top-left corner
-  display.print(F("H: "));
-  display.print(mySensorB.readFloatHumidity());
-  display.println(F("%"));
-
-  display.setTextSize(2);             // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE);        // Draw white text
-  display.print(F("P:"));
-  display.print(mySensorB.readFloatPressure()/100);
-  if (mySensorB.readFloatPressure()>SAVED_PRESSURE) {
-    Serial.println(String("^Rising"));
-    display.println("^");
-  } else  {
-    Serial.println(String("vFalling"));
-    display.println("v");
-  }
-
-  display.setTextSize(2);             // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE);        // Draw white text
-  display.print(F("A:"));
-  display.print(mySensorB.readFloatAltitudeMeters());
-  display.println("m");
-
-  display.display();
-
-  delay(1000);
+  delay(ONE_SECOND);
 }
 
 void shaft_moved() {
@@ -182,6 +147,43 @@ void shaft_moved() {
     lastInterruptTime=interruptTime;
     COUNTER=60;
   }
+}
+
+
+void update_display() {
+  display.clearDisplay();
+
+  display.setTextSize(2);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.setCursor(0,0);             // Start at top-left corner
+  display.print(F("T: "));
+  display.print(mySensorB.readTempC());
+  display.println(F("c"));
+
+  display.setTextSize(2);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.print(F("H: "));
+  display.print(mySensorB.readFloatHumidity());
+  display.println(F("%"));
+
+  display.setTextSize(2);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.print(F("P:"));
+  display.print(mySensorB.readFloatPressure()/100);
+  if (mySensorB.readFloatPressure()>SAVED_PRESSURE) {
+    display.println("^");
+  } else  {
+    display.println("v");
+  }
+
+  display.setTextSize(2);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.print(F("A:"));
+  display.print(mySensorB.readFloatAltitudeMeters());
+  display.println("m");
+
+  display.display();
+  return;
 }
 
 // void btn_pushed() {
